@@ -1,4 +1,5 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Post } from '../posts.model';
 
 @Component({
   selector: 'app-post-list',
@@ -6,9 +7,10 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./post-list.component.css'],
 })
 export class PostListComponent {
-  posts = [
-    { title: 'First Post', content: `this is first post` },
-    { title: 'Second Post', content: `this is Second post` },
-    { title: 'Third Post', content: `this is Third post` },
-  ];
+  // posts = [
+  //   { title: 'First Post', content: `this is first post` },
+  //   { title: 'Second Post', content: `this is Second post` },
+  //   { title: 'Third Post', content: `this is Third post` },
+  // ];
+  @Input() posts: Post[] = []; //need to bind it from outside(only from parent) via eventBinding, by default not bind
 }
