@@ -1,7 +1,8 @@
-import { Component, EventEmitter, Output } from '@angular/core';
+import { Component } from '@angular/core';
 import { NgForm } from '@angular/forms';
 
 import { Post } from '../posts.model';
+import { PostsService } from '../posts.service';
 
 @Component({
   selector: 'app-post-create',
@@ -13,19 +14,22 @@ export class PostCreateComponent {
   enteredTitle = '';
   enteredContent = '';
   //not using because using form element end
-  @Output() postCreated = new EventEmitter<Post>(); //can control what type of event we emit
+  // @Output()
+  // postCreated = new EventEmitter<Post>(); //can control what type of event we emit
 
+  constructor(public postsService: PostsService) {}
   //newPost='NO CONTENT';
   onAddPost(form: NgForm) {
     if (form.invalid) {
       return;
     }
-    console.log(form);
+    console.log(form.value);
     //this needs to be model/blueprints as we are using same thing for multiple components
-    const post: Post = {
-      title: form.value.title,
-      content: form.value.content,
-    };
-    this.postCreated.emit(post);
+    // const post: Post = {
+    //   title: form.value.title,
+    //   content: form.value.content,
+    // };
+    this.postsService.addPost(form.value.title, form.value.content);
+    form.resetForm();
   }
 }
