@@ -38,7 +38,7 @@ export class PostListComponent implements OnInit, OnDestroy {
     //this.postsService = postsService
   }
   ngOnInit() {
-    this.posts = this.postsService.getPosts(); //empty always
+    this.postsService.getPosts(); //empty always
     console.log(`getPost result ${this.posts}`);
     //this subscription is ever lasting if component is not in use, it will create memory leak to overcome we use Subscription from rxjs
     //this.postsService.getPostUpdateListener().subscribe((posts: Post[]) => {
