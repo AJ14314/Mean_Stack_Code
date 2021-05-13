@@ -1,0 +1,1 @@
+service is a class which we add to our angular application which let inject by angular into component and which able to centralize some tasks which provides easy access to data from within different component without property binding
