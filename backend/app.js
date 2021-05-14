@@ -33,6 +33,8 @@ app.use((req, res, next) => {
   next();
 });
 
+//to extract file we need to use multer and we can use to attach it to certain routes that should be able to accept files
+
 app.use("/api/posts", postsRouter);
 
 module.exports = app;

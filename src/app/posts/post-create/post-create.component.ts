@@ -1,9 +1,10 @@
 import { Component, OnInit } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, ParamMap } from '@angular/router';
 
 import { Post } from '../posts.model';
 import { PostsService } from '../posts.service';
+import { mimeType } from "./mime-type.validator";
 
 @Component({
   selector: 'app-post-create',
@@ -14,6 +15,10 @@ export class PostCreateComponent implements OnInit {
   //not using because using form element start
   enteredTitle = '';
   enteredContent = '';
+  //creating our form in ts of type FormGroup
+  //sync html code with typescript code
+  form: FormGroup;
+  imagePreview: string;
   private mode = 'create';
   private postId: string;
   post: Post;
@@ -28,6 +33,15 @@ export class PostCreateComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    this.form = new FormGroup({
+      title: new FormControl(null, {validators: [Validators.required, Validators.minLength(3)],}),
+      content: new FormControl(null, { validators: [Validators.required] }),
+      image: new FormControl(null, {
+        validators: [Validators.required],
+        asyncValidators: mimeType
+      }), //won't sync with html, can control it's value manually from ts
+    });
+
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
       if (paramMap.has('postId')) {
         this.mode = 'edit';
@@ -43,6 +57,10 @@ export class PostCreateComponent implements OnInit {
               title: postData.title,
               content: postData.content,
             };
+            this.form.setValue({
+              title: this.post.title,
+              content: this.post.content,
+            });
           });
         }, 0);
       } else {
@@ -51,20 +69,36 @@ export class PostCreateComponent implements OnInit {
       }
     });
   }
+
+  onImagePicked(event: Event) {
+    const file = (event.target as HTMLInputElement).files[0];
+    this.form.patchValue({ image: file });
+    this.form.get('image').updateValueAndValidity();
+    // console.log(file);
+    // console.log(this.form);
+    //convert that file into url for image tag
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result as string;
+    };
+    reader.readAsDataURL(file);
+  }
   //newPost='NO CONTENT';
-  onSavePost(form: NgForm) {
-    if (form.invalid) {
+
+  onSavePost() {
+    //form: NgForm
+    if (this.form.invalid) {
       return;
     }
     this.isLoading = true;
-    console.log(form.value);
+    console.log(this.form.value);
     if (this.mode === 'create') {
-      this.postsService.addPost(form.value.title, form.value.content);
+      this.postsService.addPost(this.form.value.title, this.form.value.content, this.form.value.image);
     } else {
       this.postsService.updatePost(
         this.postId,
-        form.value.title,
-        form.value.content
+        this.form.value.title,
+        this.form.value.content
       );
     }
     //this needs to be model/blueprints as we are using same thing for multiple components
@@ -72,6 +106,6 @@ export class PostCreateComponent implements OnInit {
     //   title: form.value.title,
     //   content: form.value.content,
     // };
-    form.resetForm();
+    this.form.reset();
   }
 }
