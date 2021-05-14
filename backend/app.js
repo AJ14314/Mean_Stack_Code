@@ -1,7 +1,21 @@
 const express = require("express");
 // const bodyParser = require("body-parser"); //deprecated
+const mongoose = require("mongoose");
+
+const postsRouter = require("./routes/posts");
 
 const app = express();
+
+mongoose
+  .connect(
+    "mongodb+srv://meancourse:meancourse@cluster0.fscz4.mongodb.net/meancoursedb?retryWrites=true&w=majority"
+  )
+  .then(() => {
+    console.log(`Connected to DB`);
+  })
+  .catch(() => {
+    console.log(`Connection failed!`);
+  });
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
@@ -14,42 +28,11 @@ app.use((req, res, next) => {
   );
   res.setHeader(
     "Access-Control-Allow-Methods",
-    "GET,POST,PATCH,DELETE,OPTIONS"
+    "GET,POST,PATCH,DELETE,OPTIONS,PUT"
   );
   next();
 });
 
-app.post("/api/posts", (req, res, next) => {
-  const post = req.body;
-  console.log(post);
-  res.status(200).json({
-    message: "New post added successfully",
-  });
-});
-
-app.get("/api/posts", (req, res, next) => {
-  //res.send(`Rsponse From Express`);
-  const posts = [
-    {
-      id: "saaqewqdas",
-      title: "First server side post",
-      content: "This is coming from the server",
-    },
-    {
-      id: "sdasd",
-      title: "Second server side post",
-      content: "This is coming from the server!",
-    },
-    {
-      id: "sdsadasf",
-      title: "Third server side post",
-      content: "This is coming from the server!!",
-    },
-  ];
-  res.status(200).json({
-    message: "Posts fetched successfully",
-    posts: posts,
-  });
-});
+app.use("/api/posts", postsRouter);
 
 module.exports = app;
