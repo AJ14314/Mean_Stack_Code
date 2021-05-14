@@ -21,8 +21,7 @@ export class PostsService {
 
     /* renaming _id to id, while receving data from the server before subscribing. hhtp client of angular uses observables we have access to operators of observables,
       + operators are functions/actions we can apply to streams/data before the data is ultimately handled in subscription*/
-    this.http
-      .get<{ message: string; posts: any }>('http://localhost:3000/api/posts')
+    this.http.get<{ message: string; posts: any }>('http://localhost:3000/api/posts')
       .pipe(
         map((postData) => {
           return postData.posts.map((post) => {
@@ -52,17 +51,25 @@ export class PostsService {
     );
   }
 
-  addPost(title: string, content: string) {
-    const post: Post = { id: null, title: title, content: content };
+  addPost(title: string, content: string, image: File) {
+    //now we have to include form data because image is added instead of post object
+    // const post: Post = { id: null, title: title, content: content };
+    const postData = new FormData(); //allows us to combine text value and blob
+    postData.append('title', title);
+    postData.append('content', content);
+    postData.append("image", image, title);// third argument is name of the image used by backend to save the file as of now post title 
+                                     //the name which we access in the backend
     this.http
-      .post<{ message: string; postId: string }>(
-        'http://localhost:3000/api/posts',
-        post
-      )
+      .post<{ message: string; postId: string }>('http://localhost:3000/api/posts',postData)
       .subscribe((responseData) => {
         console.log(responseData.message);
-        const createdId = responseData.postId;
-        post.id = createdId;
+        const post: Post = {
+          id: responseData.postId,
+          title: title,
+          content: content
+        }
+        // const createdId = responseData.postId;
+        // post.id = createdId;
         this.posts.push(post);
         this.postsUpdated.next([...this.posts]);
         this.router.navigate(['/']);
