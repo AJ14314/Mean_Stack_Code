@@ -30,16 +30,13 @@ export class PostCreateComponent implements OnInit {
   constructor(
     public postsService: PostsService,
     public route: ActivatedRoute
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.form = new FormGroup({
-      title: new FormControl(null, {validators: [Validators.required, Validators.minLength(3)],}),
+      title: new FormControl(null, { validators: [Validators.required, Validators.minLength(3)], }),
       content: new FormControl(null, { validators: [Validators.required] }),
-      image: new FormControl(null, {
-        validators: [Validators.required],
-        asyncValidators: mimeType
-      }), //won't sync with html, can control it's value manually from ts
+      image: new FormControl(null, { validators: [Validators.required], asyncValidators: [mimeType] }), //won't sync with html, can control it's value manually from ts
     });
 
     this.route.paramMap.subscribe((paramMap: ParamMap) => {
@@ -56,10 +53,12 @@ export class PostCreateComponent implements OnInit {
               id: postData._id,
               title: postData.title,
               content: postData.content,
+              imagePath: postData.imagePath
             };
             this.form.setValue({
               title: this.post.title,
               content: this.post.content,
+              image: this.post.imagePath
             });
           });
         }, 0);
@@ -95,11 +94,7 @@ export class PostCreateComponent implements OnInit {
     if (this.mode === 'create') {
       this.postsService.addPost(this.form.value.title, this.form.value.content, this.form.value.image);
     } else {
-      this.postsService.updatePost(
-        this.postId,
-        this.form.value.title,
-        this.form.value.content
-      );
+      this.postsService.updatePost(this.postId, this.form.value.title, this.form.value.content, this.form.value.image);
     }
     //this needs to be model/blueprints as we are using same thing for multiple components
     // const post: Post = {

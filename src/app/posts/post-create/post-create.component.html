@@ -6,11 +6,7 @@
         minlength="3" "-->
   <form [formGroup]="form" (submit)="onSavePost()" *ngIf="!isLoading">
     <mat-form-field>
-      <input
-        matInput
-        type="text"
-        formControlName="title"
-        placeholder="Post Title"/>
+      <input matInput type="text" formControlName="title" placeholder="Post Title" />
       <mat-error *ngIf="form.get('title').invalid">
         Please enter a post title.
       </mat-error>
@@ -27,12 +23,7 @@
     </div>
     <mat-form-field>
       <!-- [ngModel]="post?.content"  #content="ngModel" required -->
-      <textarea
-        matInput
-        rows="4"
-        formControlName="content"
-        placeholder="Post Content"
-      ></textarea>
+      <textarea matInput rows="4" formControlName="content" placeholder="Post Content"></textarea>
       <mat-error *ngIf="form.get('content').invalid">
         Please enter a post content.
       </mat-error>
