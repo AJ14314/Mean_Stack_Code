@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require("express");
 // const bodyParser = require("body-parser"); //deprecated
 const mongoose = require("mongoose");
@@ -6,12 +7,9 @@ const postsRouter = require("./routes/posts");
 
 const app = express();
 
-mongoose
-  .connect(
-    "mongodb+srv://meancourse:meancourse@cluster0.fscz4.mongodb.net/meancoursedb?retryWrites=true&w=majority"
-  )
+mongoose.connect("mongodb+srv://meancourse:meancourse@cluster0.fscz4.mongodb.net/meancoursedb?retryWrites=true&w=majority")
   .then(() => {
-    console.log(`Connected to DB`);
+    console.log(`Connected to Mongo DB`);
   })
   .catch(() => {
     console.log(`Connection failed!`);
@@ -19,6 +17,7 @@ mongoose
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use("/images", express.static(path.join("backend/images")));
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
