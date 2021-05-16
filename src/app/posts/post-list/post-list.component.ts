@@ -1,4 +1,5 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
+import { PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
 
 import { Post } from '../posts.model';
@@ -30,6 +31,10 @@ export class PostListComponent implements OnInit, OnDestroy {
   // ];
   // @Input()
   isLoading = false;
+  totalPosts = 0;
+  postsPerPage = 5;//page size how many items we want on give page
+  currentPage = 1;
+  pageSizeOptions = [5, 10, 25, 50, 100];
   posts: Post[] = []; //need to bind it from outside(only from parent) via eventBinding, by default not bind
   //postsService: PostsService;
   private postSub: Subscription; //we use to when the component is destroyed by using lifecycle hook
@@ -40,20 +45,32 @@ export class PostListComponent implements OnInit, OnDestroy {
   }
   ngOnInit() {
     this.isLoading = true;
-    this.postsService.getPosts(); //empty always
+    this.postsService.getPosts(this.postsPerPage, this.currentPage); //empty always
     //console.log(`getPost result ${this.posts}`);
     //this subscription is ever lasting if component is not in use, it will create memory leak to overcome we use Subscription from rxjs
     //this.postsService.getPostUpdateListener().subscribe((posts: Post[]) => {
     this.postSub = this.postsService
       .getPostUpdateListener()
-      .subscribe((posts: Post[]) => {
+      .subscribe((postData: { posts: Post[], postCount: number }) => {
         this.isLoading = false;
-        this.posts = posts;
+        this.posts = postData.posts;
+        this.totalPosts = postData.postCount;
       }); //subsribe 3 arguments (function execuated when data is emitted, called when error, called when observable is completed)
   }
 
   onDelete(postId: string) {
-    this.postsService.deletePost(postId);
+    this.isLoading = true;
+    this.postsService.deletePost(postId).subscribe(() => {
+      this.postsService.getPosts(this.postsPerPage, this.currentPage);
+    });
+  }
+
+  onChangedPage(pageData: PageEvent) {
+    this.isLoading = true;
+    console.log(`Page data ${JSON.stringify(pageData)}`);
+    this.currentPage = pageData.pageIndex + 1;
+    this.postsPerPage = pageData.pageSize;
+    this.postsService.getPosts(this.postsPerPage, this.currentPage);
   }
 
   ngOnDestroy() {

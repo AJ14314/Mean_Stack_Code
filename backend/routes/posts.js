@@ -53,14 +53,31 @@ router.post("", multer({ storage: storage, }).single("image"), (req, res, next) 
     }); //save provided by mongoose package for every model created and it will auto save our post in db
 });
 
-router.get("", (req, res, next) => {
+router.get("", (req, res, next) => { //for pagination we use query params
+    console.log(`req.query ${JSON.stringify(req.query)}`);
+    const pageSize = +req.query.pagesize;
+    const currentPage = +req.query.page;
+    let postQuery = Post.find();
+    let documentsResult;
+    if (pageSize && currentPage) {
+        //console.log(`in if`);
+        //for selected posts
+        postQuery.skip(pageSize * (currentPage - 1))
+            .limit(pageSize);
+    }
     //res.send(`Response From Express`);
-    Post.find().then((documents) => {
-        console.log(`documents fetched ${documents}`);
-        imageCleaner(documents);
+    postQuery.then((documents) => {
+        //instead of returning response we count the number of records by Post.count() and return it.
+        documentsResult = documents;
+        return Post.count();
+
+    }).then((count) => {
+        console.log(`documents fetched ${documentsResult} count ${count}`);
+        imageCleaner();
         res.status(200).json({
             message: "Posts fetched successfully",
-            posts: documents, //not able to access images because we need to give access to the folder
+            posts: documentsResult, //not able to access images because we need to give access to the folder
+            maxPosts: count
         });
     })
         .catch((e) => {
@@ -82,7 +99,7 @@ router.put("/:id", multer({ storage: storage, }).single("image"), (req, res, nex
         imagePath: imagePath
     });
     console.log(`updated post ${updatedPost}`);
-    Post.updateOne({ _id: req.params.id, }, updatedPost)
+    Post.updateOne({ _id: req.params.id }, updatedPost)
         .then((result) => {
             console.log("updated result " + JSON.stringify(result));
             res.status(200).json({
@@ -94,7 +111,7 @@ router.put("/:id", multer({ storage: storage, }).single("image"), (req, res, nex
 router.delete("/:id", (req, res, next) => {
     console.log(`req.params.id ${req.params.id}`);
     Post.deleteOne({
-        _id: req.params.id,
+        _id: req.params.id
     })
         .then((result) => {
             console.log(`delete result ${JSON.stringify(result)}`);
