@@ -1,6 +1,8 @@
 import { Component, Input, OnDestroy, OnInit } from '@angular/core';
 import { PageEvent } from '@angular/material/paginator';
 import { Subscription } from 'rxjs';
+import { subscribeOn } from 'rxjs/operators';
+import { AuthService } from 'src/app/auth/auth.service';
 
 import { Post } from '../posts.model';
 import { PostsService } from '../posts.service';
@@ -35,11 +37,13 @@ export class PostListComponent implements OnInit, OnDestroy {
   postsPerPage = 5;//page size how many items we want on give page
   currentPage = 1;
   pageSizeOptions = [5, 10, 25, 50, 100];
+  userIsAuthenticated = false;
   posts: Post[] = []; //need to bind it from outside(only from parent) via eventBinding, by default not bind
   //postsService: PostsService;
   private postSub: Subscription; //we use to when the component is destroyed by using lifecycle hook
+  private authStatusSub: Subscription;
 
-  constructor(public postsService: PostsService) {
+  constructor(public postsService: PostsService, private authService: AuthService) {
     //we can do this or use angular lifecylce of hook OnInit
     //this.postsService = postsService
   }
@@ -56,6 +60,10 @@ export class PostListComponent implements OnInit, OnDestroy {
         this.posts = postData.posts;
         this.totalPosts = postData.postCount;
       }); //subsribe 3 arguments (function execuated when data is emitted, called when error, called when observable is completed)
+    this.userIsAuthenticated = this.authService.getIsAuth();
+    this.authStatusSub = this.authService.getAuthStatusListener().subscribe(isAutheticated => {
+      this.userIsAuthenticated = isAutheticated;
+    });
   }
 
   onDelete(postId: string) {
@@ -75,5 +83,6 @@ export class PostListComponent implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.postSub.unsubscribe(); //prevent memory leaks
+    this.authStatusSub.unsubscribe();
   }
 }
