@@ -14,6 +14,9 @@ export class PostsService {
   private posts: Post[] = [];
   private postsUpdated = new Subject<{ posts: Post[], postCount: number }>();
 
+  //to use token we need to inject auth srvice into this service or we can create intercepter for our httpclient 
+  //angular feature
+  //thay are funtions that are run on any outgoing http request
   constructor(private http: HttpClient, private router: Router) { }
 
   getPosts(postsPerPage: number, currentPage: number) {
@@ -36,7 +39,7 @@ export class PostsService {
     })
     )
       .subscribe((transformedPostData) => {
-        console.log(`transformedPosts ${JSON.stringify(transformedPostData)}`);
+        // console.log(`transformedPosts ${JSON.stringify(transformedPostData)}`);
         this.posts = transformedPostData.posts;
         this.postsUpdated.next({ posts: [...this.posts], postCount: transformedPostData.maxPosts });
       });

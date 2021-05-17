@@ -5,3 +5,17 @@ mongo db connection url
 mongo "mongodb+srv://cluster0.fscz4.mongodb.net/meancoursedb" --username meancourse
 Password:-
 use meancoursedb
+
+SAP Authentication
+SAP backend (=>APIs) are stateless and decoupled from front end 2servers
+we can do Authentication by json web token generated on server hashed on successful login and send back to frontend where we can store it in angular app cookie/localstorage
+that token is attached to future requests as part of url or header, that token cann't be faked only server can decode it.
+
+104:- depending on the token we need to protect few routes
+in posts routes add/edit/delete needs to be protected
+
+to proetect the route we will use an extra middleware to autheticate the request
+
+110:- we will route guards to avoid user to got to any particular page via url as he/she is not authenticated to use the page
+
+111:- token expires in 1h that fronent doen't know, we have to inform frontend the same thing

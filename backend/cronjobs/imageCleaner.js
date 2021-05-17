@@ -23,7 +23,7 @@ const imageCleaner = () => {
             imageNames.push((post.imagePath).split('/')[((post.imagePath).split('/')).length - 1]);
         });
 
-        fs.readdir('../images', (err, files) => {
+        fs.readdir('../mean-course/backend/images', (err, files) => {
             console.log(err);
             console.log(`resultFiles ${files}`);
             console.log(`resultImages ${imageNames}`);

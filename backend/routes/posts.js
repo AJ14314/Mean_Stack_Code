@@ -1,5 +1,6 @@
 const express = require("express");
 const multer = require("multer"); //requires configuration
+const checkAuth = require("../middleware/check-auth");
 
 const Post = require("../models/post");
 
@@ -29,7 +30,7 @@ const storage = multer.diskStorage({
     },
 });
 
-router.post("", multer({ storage: storage, }).single("image"), (req, res, next) => {
+router.post("", checkAuth, multer({ storage: storage, }).single("image"), (req, res, next) => {
     const url = req.protocol + "://" + req.get("host");
     const post = new Post({
         title: req.body.title,
@@ -73,7 +74,7 @@ router.get("", (req, res, next) => { //for pagination we use query params
 
     }).then((count) => {
         console.log(`documents fetched ${documentsResult} count ${count}`);
-        imageCleaner();
+        //imageCleaner();
         res.status(200).json({
             message: "Posts fetched successfully",
             posts: documentsResult, //not able to access images because we need to give access to the folder
@@ -85,7 +86,19 @@ router.get("", (req, res, next) => { //for pagination we use query params
         });
 });
 
-router.put("/:id", multer({ storage: storage, }).single("image"), (req, res, next) => {
+router.get("/:id", (req, res, next) => {
+    Post.findById(req.params.id).then((post) => {
+        if (post) {
+            res.status(200).json(post);
+        } else {
+            res.status(404).json({
+                message: `Post not found with id "${req.params.id}".`,
+            });
+        }
+    });
+});
+
+router.put("/:id", checkAuth, multer({ storage: storage, }).single("image"), (req, res, next) => {
     //console.log(`req.file ${req.file}`); //undefined if not changes
     let imagePath = req.body.imagePath;
     if (req.file) { //means new file upload
@@ -108,7 +121,7 @@ router.put("/:id", multer({ storage: storage, }).single("image"), (req, res, nex
         });
 });
 
-router.delete("/:id", (req, res, next) => {
+router.delete("/:id", checkAuth, (req, res, next) => {
     console.log(`req.params.id ${req.params.id}`);
     Post.deleteOne({
         _id: req.params.id
@@ -127,16 +140,6 @@ router.delete("/:id", (req, res, next) => {
         });
 });
 
-router.get("/:id", (req, res, next) => {
-    Post.findById(req.params.id).then((post) => {
-        if (post) {
-            res.status(200).json(post);
-        } else {
-            res.status(404).json({
-                message: `Post not found with id "${req.params.id}".`,
-            });
-        }
-    });
-});
+
 
 module.exports = router;
