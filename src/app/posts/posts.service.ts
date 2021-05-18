@@ -32,14 +32,15 @@ export class PostsService {
             id: post._id,
             title: post.title,
             content: post.content,
-            imagePath: post.imagePath
+            imagePath: post.imagePath,
+            creator: post.creator
           };
         }), maxPosts: postData.maxPosts
       }
     })
     )
       .subscribe((transformedPostData) => {
-        // console.log(`transformedPosts ${JSON.stringify(transformedPostData)}`);
+        console.log(`transformedPosts ${JSON.stringify(transformedPostData)}`);
         this.posts = transformedPostData.posts;
         this.postsUpdated.next({ posts: [...this.posts], postCount: transformedPostData.maxPosts });
       });
@@ -51,7 +52,7 @@ export class PostsService {
 
   // addPost(post: Post){}
   getPost(id: string) {
-    return this.http.get<{ _id: string; title: string; content: string, imagePath: string }>(
+    return this.http.get<{ _id: string; title: string; content: string; imagePath: string; creator: string }>(
       `http://localhost:3000/api/posts/${id}`
     );
   }
@@ -90,13 +91,13 @@ export class PostsService {
       postData.append('title', title);
       postData.append('content', content);
       postData.append('image', image, title);
-
+      //postData.append('creator', null);
     } else {
       postData = {
-        id: id, title: title, content: content, imagePath: image
+        id: id, title: title, content: content, imagePath: image, creator: null
       }
     }
-    console.log(`Updated post here ${postData}`);
+    console.log(`Updated post here ${JSON.stringify(postData)}`);
     this.http
       .put('http://localhost:3000/api/posts/' + id, postData)
       .subscribe((response) => {

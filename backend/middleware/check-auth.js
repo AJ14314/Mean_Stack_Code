@@ -10,7 +10,11 @@ module.exports = (req, res, next) => {
                 message: 'Token not found'
             });
         }
-        jwt.verify(token, 'this_is_the_secret_key_which_is_used_to_generate_token');
+        const decodedToken = jwt.verify(token, 'this_is_the_secret_key_which_is_used_to_generate_token'); //using it to fetch while inserting new post
+        req.userData = {
+            email: decodedToken.email,
+            userId: decodedToken.userId
+        };//every middleware who is using the checkAuth have access to these new fields
         next();
     } catch (error) {
         console.log(`error auth failed ${error}`);

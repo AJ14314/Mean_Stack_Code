@@ -17,7 +17,7 @@ const imageCleaner = () => {
     Post.find().then((documents) => {
         //instead of returning response we count the number of records by Post.count() and return it.
         console.log(`docs ${documents}`)
-        mongoose.connection.close();
+        //mongoose.connection.close();
         let imageNames = [];
         documents.map(post => {
             imageNames.push((post.imagePath).split('/')[((post.imagePath).split('/')).length - 1]);
@@ -30,7 +30,7 @@ const imageCleaner = () => {
             files = files.filter(val => !imageNames.includes(val));
             console.log(`FinalImageNames ${files}`);
             for (const file of files) {
-                fs.unlink(path.join('../images', file), err => {
+                fs.unlink(path.join('../mean-course/backend/images', file), err => {
                     if (err) throw err;
                 });
             }
