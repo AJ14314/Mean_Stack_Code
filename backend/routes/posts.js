@@ -32,10 +32,12 @@ const storage = multer.diskStorage({
 
 router.post("", checkAuth, multer({ storage: storage, }).single("image"), (req, res, next) => {
     const url = req.protocol + "://" + req.get("host");
+
     const post = new Post({
         title: req.body.title,
         content: req.body.content,
-        imagePath: url + "/images/" + req.file.filename
+        imagePath: url + "/images/" + req.file.filename,
+        creator: req.userData.userId //not as part of body but will be part of our token //check-auth we are verifying the token
     });
     console.log(`new post ${post}`);
     post.save().then((createdPost) => {
@@ -74,7 +76,7 @@ router.get("", (req, res, next) => { //for pagination we use query params
 
     }).then((count) => {
         console.log(`documents fetched ${documentsResult} count ${count}`);
-        //imageCleaner();
+        imageCleaner();
         res.status(200).json({
             message: "Posts fetched successfully",
             posts: documentsResult, //not able to access images because we need to give access to the folder
@@ -100,6 +102,8 @@ router.get("/:id", (req, res, next) => {
 
 router.put("/:id", checkAuth, multer({ storage: storage, }).single("image"), (req, res, next) => {
     //console.log(`req.file ${req.file}`); //undefined if not changes
+
+
     let imagePath = req.body.imagePath;
     if (req.file) { //means new file upload
         const url = req.protocol + "://" + req.get("host");
@@ -109,28 +113,59 @@ router.put("/:id", checkAuth, multer({ storage: storage, }).single("image"), (re
         _id: req.params.id,
         title: req.body.title,
         content: req.body.content,
-        imagePath: imagePath
+        imagePath: imagePath,
+        creator: req.userData.userId
     });
     console.log(`updated post ${updatedPost}`);
-    Post.updateOne({ _id: req.params.id }, updatedPost)
+    Post.where({ creator: req.userData.userId, _id: req.params.id }).updateOne({ _id: req.params.id }, updatedPost, { "upsert": false })
         .then((result) => {
             console.log("updated result " + JSON.stringify(result));
-            res.status(200).json({
-                message: `Post updated successfully with id "${req.params.id}"`,
-            });
+            const { matchedCount, modifiedCount } = result;
+            if (result.nModified > 0 || result.n > 0) {
+                res.status(200).json({
+                    message: `Post updated successfully with id "${req.params.id}"`,
+                });
+            } else {
+                res.status(401).json({
+                    message: `Not authorized to update the post`,
+                });
+            }
+
+        }).catch(e => {
+            console.log(`error while updating the post ${e}`);
         });
+    // Post.updateOne({ _id: req.params.id, creator: req.userData.userId }, updatedPost) //restrict user who is not created the post to edit
+    //     .then((result) => {
+    //         console.log("updated result " + JSON.stringify(result));
+    //         if (result.nModified > 0) {
+    //             res.status(200).json({
+    //                 message: `Post updated successfully with id "${req.params.id}"`,
+    //             });
+    //         } else {
+    //             res.status(401).json({
+    //                 message: `Not authorized to update the post`,
+    //             });
+    //         }
+
+    //     }).catch(e => {
+    //         console.log(`error while updating the post ${e}`);
+    //     });
 });
 
 router.delete("/:id", checkAuth, (req, res, next) => {
     console.log(`req.params.id ${req.params.id}`);
-    Post.deleteOne({
-        _id: req.params.id
-    })
+    Post.deleteOne({ _id: req.params.id, creator: req.userData.userId })
         .then((result) => {
             console.log(`delete result ${JSON.stringify(result)}`);
-            res.status(200).send({
-                message: `Post deleted with id "${req.params.id}".`,
-            });
+            if (result.n > 0) {
+                res.status(200).send({
+                    message: `Post deleted with id "${req.params.id}"`,
+                });
+            } else {
+                res.status(401).send({
+                    message: `Not authorized to delete the post`,
+                });
+            }
         })
         .catch((e) => {
             console.log(`error while deleting post with id ${req.params.id} ${e}`);

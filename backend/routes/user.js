@@ -63,7 +63,8 @@ router.post('/login', (req, res, next) => {
             console.log(token);
             res.status(200).json({
                 token: token,
-                expiresIn: 3600 //seconds
+                expiresIn: 3600, //seconds
+                userId: userFound._id
             });
         }).catch((err) => {
             console.log(`error in password checking ${err}`);

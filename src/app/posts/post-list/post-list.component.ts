@@ -38,6 +38,7 @@ export class PostListComponent implements OnInit, OnDestroy {
   currentPage = 1;
   pageSizeOptions = [5, 10, 25, 50, 100];
   userIsAuthenticated = false;
+  userId: string;
   posts: Post[] = []; //need to bind it from outside(only from parent) via eventBinding, by default not bind
   //postsService: PostsService;
   private postSub: Subscription; //we use to when the component is destroyed by using lifecycle hook
@@ -50,6 +51,8 @@ export class PostListComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.isLoading = true;
     this.postsService.getPosts(this.postsPerPage, this.currentPage); //empty always
+    this.userId = this.authService.getUserId();
+    console.log(`userID ${this.userId}`);
     //console.log(`getPost result ${this.posts}`);
     //this subscription is ever lasting if component is not in use, it will create memory leak to overcome we use Subscription from rxjs
     //this.postsService.getPostUpdateListener().subscribe((posts: Post[]) => {
@@ -62,6 +65,8 @@ export class PostListComponent implements OnInit, OnDestroy {
       }); //subsribe 3 arguments (function execuated when data is emitted, called when error, called when observable is completed)
     this.userIsAuthenticated = this.authService.getIsAuth();
     this.authStatusSub = this.authService.getAuthStatusListener().subscribe(isAutheticated => {
+      console.log(`userID1 ${this.userId}`);
+      this.userId = this.authService.getUserId();
       this.userIsAuthenticated = isAutheticated;
     });
   }

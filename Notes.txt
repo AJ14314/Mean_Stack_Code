@@ -19,3 +19,6 @@ to proetect the route we will use an extra middleware to autheticate the request
 110:- we will route guards to avoid user to got to any particular page via url as he/she is not authenticated to use the page
 
 111:- token expires in 1h that fronent doen't know, we have to inform frontend the same thing
+
+114:- only the user who created the post can edit/delete, connecting users and posts
+either we can user list of posts in user object or (user object in our post object) easy to implement
