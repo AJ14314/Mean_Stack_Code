@@ -37,10 +37,16 @@ export class AuthService {
         const authData: AuthData = {
             username: username, email: email, password: password
         }
-        this.httpClient.post("http://localhost:3000/api/user/signup", authData).subscribe(response => {
-            console.log(`response signup`);
-            console.log(response);
-        })
+        this.httpClient.post("http://localhost:3000/api/user/signup", authData)
+            .subscribe(response => {
+                console.log(`response signup`);
+                console.log(response);
+                this.router.navigate(["/"]);
+            }, error => {
+                console.log(`error ${JSON.stringify(error)}`);
+                this.authStatusListener.next(false);
+            });  //second argument for error handling in subscribe method 
+        //still loader is runnning instead we will return observable and subscribe in the component
     }
 
     login(email: string, password: string) {
@@ -64,6 +70,9 @@ export class AuthService {
                 this.router.navigate(['/']);
             }
 
+        }, error => {
+            //console.log(`error ${JSON.stringify(error)}`);
+            this.authStatusListener.next(false);
         });
     }
 

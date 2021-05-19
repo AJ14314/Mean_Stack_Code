@@ -30,32 +30,6 @@ const storage = multer.diskStorage({
     },
 });
 
-router.post("", checkAuth, multer({ storage: storage, }).single("image"), (req, res, next) => {
-    const url = req.protocol + "://" + req.get("host");
-
-    const post = new Post({
-        title: req.body.title,
-        content: req.body.content,
-        imagePath: url + "/images/" + req.file.filename,
-        creator: req.userData.userId //not as part of body but will be part of our token //check-auth we are verifying the token
-    });
-    console.log(`new post ${post}`);
-    post.save().then((createdPost) => {
-        console.log(`post added result ${JSON.stringify(createdPost)}`);
-        res.status(201).json({
-            message: "New post added successfully",
-            post: {
-                // ...createdPost,
-                // id: createdPost._id
-                post: createdPost._id,
-                title: createdPost.title,
-                content: createdPost.content,
-                imagePath: createdPost.imagePath
-            }
-        });
-    }); //save provided by mongoose package for every model created and it will auto save our post in db
-});
-
 router.get("", (req, res, next) => { //for pagination we use query params
     console.log(`req.query ${JSON.stringify(req.query)}`);
     const pageSize = +req.query.pagesize;
@@ -82,10 +56,12 @@ router.get("", (req, res, next) => { //for pagination we use query params
             posts: documentsResult, //not able to access images because we need to give access to the folder
             maxPosts: count
         });
-    })
-        .catch((e) => {
-            console.log(`Error while fetching ${e}`);
+    }).catch((e) => {
+        console.log(`Error while fetching ${e}`);
+        res.status(500).json({
+            message: 'Fetching posts failed!'
         });
+    });
 });
 
 router.get("/:id", (req, res, next) => {
@@ -97,7 +73,42 @@ router.get("/:id", (req, res, next) => {
                 message: `Post not found with id "${req.params.id}".`,
             });
         }
+    }).catch((e) => {
+        console.log(`Error while fetching ${e}`);
+        res.status(500).json({
+            message: 'Fetching post failed!'
+        });
     });
+});
+
+router.post("", checkAuth, multer({ storage: storage, }).single("image"), (req, res, next) => {
+    const url = req.protocol + "://" + req.get("host");
+
+    const post = new Post({
+        title: req.body.title,
+        content: req.body.content,
+        imagePath: url + "/images/" + req.file.filename,
+        creator: req.userData.userId //not as part of body but will be part of our token //check-auth we are verifying the token
+    });
+    console.log(`new post ${post}`);
+    post.save().then((createdPost) => {
+        console.log(`post added result ${JSON.stringify(createdPost)}`);
+        res.status(201).json({
+            message: "New post added successfully",
+            post: {
+                // ...createdPost,
+                // id: createdPost._id
+                post: createdPost._id,
+                title: createdPost.title,
+                content: createdPost.content,
+                imagePath: createdPost.imagePath
+            }
+        });
+    }).catch(error => {
+        res.status(500).json({
+            message: `Post creation failed!`
+        });
+    }); //save provided by mongoose package for every model created and it will auto save our post in db
 });
 
 router.put("/:id", checkAuth, multer({ storage: storage, }).single("image"), (req, res, next) => {
@@ -133,6 +144,9 @@ router.put("/:id", checkAuth, multer({ storage: storage, }).single("image"), (re
 
         }).catch(e => {
             console.log(`error while updating the post ${e}`);
+            res.status(500).json({
+                message: 'Post updation failed!'
+            })
         });
     // Post.updateOne({ _id: req.params.id, creator: req.userData.userId }, updatedPost) //restrict user who is not created the post to edit
     //     .then((result) => {
@@ -169,7 +183,7 @@ router.delete("/:id", checkAuth, (req, res, next) => {
         })
         .catch((e) => {
             console.log(`error while deleting post with id ${req.params.id} ${e}`);
-            res.status(422).send({
+            res.status(500).send({
                 message: `error while deleting post with id "${req.params.id}".`,
             });
         });

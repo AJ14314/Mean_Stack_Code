@@ -23,8 +23,10 @@ router.post("/signup", (req, res, next) => {
         }).catch((e) => {
             console.log(`error while user signup ${e}`);
             res.status(500).json({
-                message: 'User signup service unavailable',
-                error: e
+                // message: 'User signup service unavailable',
+                // error: {
+                message: 'Invalid authentication credentials!'
+                // }
             });
         })
     })
@@ -69,7 +71,7 @@ router.post('/login', (req, res, next) => {
         }).catch((err) => {
             console.log(`error in password checking ${err}`);
             return res.status(401).json({
-                message: 'Authentication failed'
+                message: 'Invalid login credetials!'
             });
         });
     //     .catch (e => {

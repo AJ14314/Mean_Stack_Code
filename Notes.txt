@@ -22,3 +22,18 @@ to proetect the route we will use an extra middleware to autheticate the request
 
 114:- only the user who created the post can edit/delete, connecting users and posts
 either we can user list of posts in user object or (user object in our post object) easy to implement
+
+122:- Error handling:- simple thing is to add a handler in observable which is reponsible for sending erroneous request.
+
+123:- Error message by using error interceptor //like auth-interceptor===> error-interceptor.ts
+        we can listen to the reponse I don't want to edit the request, want to listen to the response
+        handle gives us back the response observable stream and we can just hook into the stream and listen the events
+        useing pipe provided by rxjs to add an operator to the stream and catchError() provided by rxjs
+
+        we are adding something to the observable stream, handling it in the diff places of our app
+        return an observable inside of the catchError even if we have an error , can use throwError(), will generate a new observable to which we can pass error
+
+124:- error component is going to generate dynamically we need to tell angular and attached in ngModule by fifth property called entryComponents 
+        angular now know that this component is going to get used even though angular cannot see it.
+
+127:- if for some reason error ocurred on new post page then I want to also not show the spineer any more
