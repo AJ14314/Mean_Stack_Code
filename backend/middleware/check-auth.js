@@ -10,7 +10,7 @@ module.exports = (req, res, next) => {
                 message: 'Token not found'
             });
         }
-        const decodedToken = jwt.verify(token, 'this_is_the_secret_key_which_is_used_to_generate_token'); //using it to fetch while inserting new post
+        const decodedToken = jwt.verify(token, process.env.JWT_KEY); //using it to fetch while inserting new post
         req.userData = {
             email: decodedToken.email,
             userId: decodedToken.userId
