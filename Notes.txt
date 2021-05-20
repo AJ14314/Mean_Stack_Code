@@ -37,3 +37,16 @@ either we can user list of posts in user object or (user object in our post obje
         angular now know that this component is going to get used even though angular cannot see it.
 
 127:- if for some reason error ocurred on new post page then I want to also not show the spineer any more
+
+131:- seperating the multer logic in seperate file because it is a middleware
+
+132:- optimizing front-end //all material imports in their own ngModule and just import that ngModule into app module.ts
+        it will make code easier to read
+
+136:- after optimization of modules in seperate file we can also improve the run time performance of the app
+        we are not exporting anything in the auth/post module.ts because Router is managed globally and we can use router to only load code when we need it
+        for login/signup router we don't always need them, we might not need to login so loading all the code for that and logic for that component in advanced is bit redundant
+        for login/signup I want to load them lazyly only when we need them, AngularRouter make this easy
+        we will manage the auth-routing.module.ts file seperately
+        in the app-routing.module.ts we have to connect the chil routing module auth-routing.module.ts
+        remove that particular router module from app.module.ts

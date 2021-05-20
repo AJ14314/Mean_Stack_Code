@@ -4,7 +4,10 @@ import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { map } from 'rxjs/operators';
 
+import { environment } from '../../environments/environment';
 import { Post } from './posts.model';
+
+const BACKEND_URL = `${environment.apiURL}/posts`;
 
 //angular create 1 intance of the service
 //{1.angular is unaware of the service yet, we have to include service in the app module in providers
@@ -25,7 +28,7 @@ export class PostsService {
     /* renaming _id to id, while receving data from the server before subscribing. hhtp client of angular uses observables we have access to operators of observables,
       + operators are functions/actions we can apply to streams/data before the data is ultimately handled in subscription*/
     const queryParams = `?pagesize=${postsPerPage}&page=${currentPage}`;
-    this.http.get<{ message: string; posts: any; maxPosts: number }>('http://localhost:3000/api/posts' + queryParams).pipe(map((postData) => {
+    this.http.get<{ message: string; posts: any; maxPosts: number }>(BACKEND_URL + queryParams).pipe(map((postData) => {
       return {
         posts: postData.posts.map((post) => {
           return {
@@ -53,7 +56,7 @@ export class PostsService {
   // addPost(post: Post){}
   getPost(id: string) {
     return this.http.get<{ _id: string; title: string; content: string; imagePath: string; creator: string }>(
-      `http://localhost:3000/api/posts/${id}`
+      `${BACKEND_URL}/${id}`
     );
   }
 
@@ -65,7 +68,7 @@ export class PostsService {
     postData.append('content', content);
     postData.append('image', image, title); // third argument is name of the image used by backend to save the file as of now post title
     //the name which we access in the backend
-    this.http.post<{ message: string; post: Post }>('http://localhost:3000/api/posts', postData)
+    this.http.post<{ message: string; post: Post }>(BACKEND_URL, postData)
       .subscribe((responseData) => {
         console.log(responseData.message);
         // const post: Post = {
@@ -99,7 +102,7 @@ export class PostsService {
     }
     console.log(`Updated post here ${JSON.stringify(postData)}`);
     this.http
-      .put('http://localhost:3000/api/posts/' + id, postData)
+      .put(`${BACKEND_URL}/${id}`, postData)
       .subscribe((response) => {
         console.log(`response updated ${JSON.stringify(response)}`);
         // const updatedPosts = [...this.posts];
@@ -115,6 +118,6 @@ export class PostsService {
   }
 
   deletePost(postId: string) {
-    return this.http.delete('http://localhost:3000/api/posts/' + postId);
+    return this.http.delete(`${BACKEND_URL}/${postId}`);
   }
 }
