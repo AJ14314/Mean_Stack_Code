@@ -15,6 +15,7 @@ import { PostModule } from './posts/posts.module';
 
 
 
+
 @NgModule({
   declarations: [
     AppComponent,
@@ -27,7 +28,7 @@ import { PostModule } from './posts/posts.module';
     BrowserAnimationsModule,
     HttpClientModule,
     AngularMaterialModule,
-    PostModule,
+    PostModule
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
