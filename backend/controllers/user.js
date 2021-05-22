@@ -77,3 +77,22 @@ exports.userLogin = (req, res, next) => {
     //     });
     // });
 };
+
+exports.fetchUserProfile = (req, res, next) => {
+    console.log(`fething user with id ${req.params.userid}`)
+    User.findOne({
+        _id: req.params.userid
+    }).then(user => {
+        if (!user) {
+            console.log(`user not found`);
+            return res.status(404).json({
+                message: 'User not found!'
+            });
+        }
+        console.log(`user found ${JSON.stringify(user)}`);
+        res.status(200).json({
+            message: 'User details',
+            userDetails: user
+        });
+    })
+}

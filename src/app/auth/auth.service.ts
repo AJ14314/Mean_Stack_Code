@@ -7,8 +7,9 @@ import { AuthData } from "./auth-data.model";
 import { LoginData } from "./login-data.model";
 
 import { environment } from '../../environments/environment';
+import { EmailValidator } from "@angular/forms";
 
-const BACKEND_URL = `environment.apiURL/user`;
+const BACKEND_URL = `${environment.apiURL}/user`;
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -16,6 +17,7 @@ export class AuthService {
     private token: string;
     private tokenTimer: any;
     private userId: string;
+    private userDetails: AuthData;
     private authStatusListener = new Subject<boolean>();
 
     constructor(private httpClient: HttpClient, private router: Router) { }
@@ -37,6 +39,10 @@ export class AuthService {
         return this.userId;
     }
 
+    getUserDetails() {
+        return this.userDetails;
+    }
+
     createUser(email: string, password: string, username: string) {
         const authData: AuthData = {
             username: username, email: email, password: password
@@ -51,6 +57,16 @@ export class AuthService {
                 this.authStatusListener.next(false);
             });  //second argument for error handling in subscribe method 
         //still loader is runnning instead we will return observable and subscribe in the component
+    }
+
+    fetchUserProfile(userId: string) {
+        this.httpClient.get<{ message: string, userDetails: AuthData }>(`${BACKEND_URL}/${userId}`)
+            .subscribe(response => {
+                console.log(`response profile`);
+                console.log(response);
+                this.userDetails = response.userDetails;
+                this.authStatusListener.next(true);
+            });
     }
 
     login(email: string, password: string) {

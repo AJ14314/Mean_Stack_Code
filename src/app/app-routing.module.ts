@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './auth/auth.guard';
 import { PostCreateComponent } from './posts/post-create/post-create.component';
 import { PostListComponent } from './posts/post-list/post-list.component';
+import { ProfileComponent } from './auth/profile/profile.component';
 
 //routes are javascript objects where we define for which url which part of our should be presented
 const routes: Routes = [

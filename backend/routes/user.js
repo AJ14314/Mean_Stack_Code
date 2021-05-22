@@ -8,4 +8,6 @@ router.post("/signup", userController.createUser); //calling without brackets to
 
 router.post('/login', userController.userLogin);
 
+router.get('/:userid', userController.fetchUserProfile);
+
 module.exports = router;
