@@ -9,7 +9,7 @@ const userRoutes = require("./routes/user");
 const app = express();
 
 
-mongoose.connect(`mongodb+srv://meancourse:${process.env.MONGO_ATLAS_PW}@cluster0.fscz4.mongodb.net/meancoursedb?retryWrites=true&w=majority`)
+mongoose.connect(`mongodb+srv://testuser:YXtT1enIAZNGUHDZ@cluster0.fscz4.mongodb.net/meancoursedb?retryWrites=true&w=majority`, { useNewUrlParser: true, useUnifiedTopology: true })
     .then(() => {
         console.log(`Connected to Mongo DB`);
     })
