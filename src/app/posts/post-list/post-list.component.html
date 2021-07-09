@@ -11,6 +11,7 @@
     <p>{{ post.content }}</p>
     <mat-action-row *ngIf="userIsAuthenticated && userId===post.creator">
       <!-- showing buttons to all the autheticated user will restrcit to the creator -->
+      <a mat-button color="primary" [routerLink]="['/share',post.id]">Share</a>
       <a mat-button color="primary" [routerLink]="['/edit', post.id]">EDIT</a>
       <button mat-button color="warn" (click)="onDelete(post.id)">DELETE</button>
     </mat-action-row>
