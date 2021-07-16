@@ -56,7 +56,7 @@ exports.userLogin = (req, res, next) => {
             console.log(`creating jwt token`);
             //jwt.sign(input,secretkey/password,[optional]{expiresIn}) to encrypt
             const token = jwt.sign({ username: userFound.username, email: userFound.email, userId: userFound._id },
-                "this_is_the_secret_key_which_is_used_to_generate_token", { expiresIn: "1h" });
+                process.env.JWT_KEY, { expiresIn: "1h" });
             console.log(token);
             res.status(200).json({
                 token: token,

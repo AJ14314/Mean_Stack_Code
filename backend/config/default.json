@@ -1,6 +1,6 @@
 {
     "localhost":{
-        "MONGO_ATLAS_PW": "meancourse",
+        "MONGO_ATLAS_PW": "YXtT1enIAZNGUHDZ",
         "JWT_KEY":"this_is_the_secret_key_which_is_used_to_generate_token"
     }
 }
